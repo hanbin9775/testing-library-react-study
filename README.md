@@ -1,46 +1,69 @@
-# Getting Started with Create React App
+# Testing Library (/w React)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### Required modules
 
-## Available Scripts
+- msw (for mocking http request/response)
+- testing-library/react
 
-In the project directory, you can run:
+# 필요성
 
-### `yarn start`
+- storybook 도 훌륭한 ui 테스팅 라이브러리이지만 항상 모든 인터렉션을 검증하기엔 적합하지 않다.
+- 개발 당시 의도한 인터렉션을 모두 명시하고 실행 가능한 코드로 작성한다는 것에 의미가 있다고 생각한다.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+# Usage
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## render
 
-### `yarn test`
+```
+function render(
+    ui: React.ReactElement<any>,
+    options?: {
+        ...
+    }
+): RenderResult
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+인자로 넘겨준 ReactElement를 document.body 에 append 한다.
+제공되는 옵션은 다음과 같다.
 
-### `yarn build`
+### container
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+첫번째 인자로 넘겨준 ReactElement를 append 할 container.
+default: document.body
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### baseElement
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+baseElement = container ? container : document.body
+```
 
-### `yarn eject`
+### hydrate
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+hydrate = true 인 경우 ReactDom.hydrate로 render 한다.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### wrapper
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```
+const AllTheProviders = ({children}) => {
+  return (
+    <ThemeProvider theme="light">
+      <TranslationProvider messages={defaultStrings}>
+        {children}
+      </TranslationProvider>
+    </ThemeProvider>
+  )
+}
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+const customRender = (ui, options) =>
+  render(ui, {wrapper: AllTheProviders, ...options})
+```
 
-## Learn More
+Provider 컴포넌트가 있을 경우 편리함.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### queries
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+bind할 query들. default query를 오버라이드할 custom query
+
+## RenderResult
+
+render 함수의 가장 중요한 특징 중 하나는
