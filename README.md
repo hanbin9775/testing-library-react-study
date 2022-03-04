@@ -7,7 +7,10 @@
 
 # 필요성
 
+> 주관적인 의견이 포함되어있습니다.
+
 - storybook 도 훌륭한 ui 테스팅 라이브러리이지만 항상 모든 인터렉션을 검증하기엔 적합하지 않다.
+- storybook 에선 prop 변화에 따른 컴포넌트 렌더링을 보여주기 힘들다.
 - 개발 당시 의도한 인터렉션을 모두 명시하고 실행 가능한 코드로 작성한다는 것에 의미가 있다고 생각한다.
 
 # Usage
@@ -66,4 +69,22 @@ bind할 query들. default query를 오버라이드할 custom query
 
 ## RenderResult
 
-render 함수의 가장 중요한 특징 중 하나는
+### ...queries
+
+```
+const {getByLabelText, queryAllByTestId, ... ,} = render(<Component />)
+```
+
+보통 이렇게도 query들을 구조분해로 꺼내쓰지만
+
+```
+import { render, screen } from "@testing-library/react";
+
+render(<Component />);
+
+screen.getByLabelText("...");
+```
+
+처럼 screen 객체에서 바로 접근하기도 한다.
+
+이 방식이 하나하나 꺼내쓰는 방법보다 훨씬 편한듯.

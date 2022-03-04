@@ -16,9 +16,9 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 test("loads and displays greeting", async () => {
-  render(<Fetch url="/greeting" />);
+  const { getByText } = render(<Fetch url="/greeting" />);
 
-  fireEvent.click(screen.getByText("Load Greeting"));
+  fireEvent.click(getByText("Load Greeting"));
 
   await waitFor(() => screen.getByRole("heading"));
 
