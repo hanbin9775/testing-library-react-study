@@ -42,6 +42,7 @@
     ]
   },
   "devDependencies": {
-    "msw": "^0.38.2"
+    "msw": "^0.38.2",
+    "snapshot-diff": "^0.9.0"
   }
 }

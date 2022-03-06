@@ -71,8 +71,12 @@ bind할 query들. default query를 오버라이드할 custom query
 
 ### ...queries
 
+테스트 대상인 컴포넌트의 element, text 를 읽어오는 메서드.
+
 ```
 const {getByLabelText, queryAllByTestId, ... ,} = render(<Component />)
+
+getByLabelText("...");
 ```
 
 보통 이렇게도 query들을 구조분해로 꺼내쓰지만
@@ -88,3 +92,68 @@ screen.getByLabelText("...");
 처럼 screen 객체에서 바로 접근하기도 한다.
 
 이 방식이 하나하나 꺼내쓰는 방법보다 훨씬 편한듯.
+
+### container
+
+렌더한 컴포넌트를 감싸는 컨테이너 element. div 로 구성되어있다.
+
+### baseElement
+
+render 메서드에 옵션으로 넘겨주지 않았다면 document.body 로 default
+
+### debug
+
+console.log(prettyDom(baseElement)) 의 숏컷
+
+### rerender
+
+```
+import {render} from '@testing-library/react'
+
+const {rerender} = render(<NumberDisplay number={1} />)
+
+// re-render the same component with different props
+rerender(<NumberDisplay number={2} />)
+```
+
+### unmount
+
+```
+import {render} from '@testing-library/react'
+
+const {container, unmount} = render(<Login />)
+unmount()
+// your component has been unmounted and now: container.innerHTML === ''
+```
+
+### asFragment
+
+```
+import React, {useState} from 'react'
+import {render, fireEvent} from '@testing-library/react'
+import { toMatchDiffSnapshot } from "snapshot-diff";
+expect.extend({ toMatchDiffSnapshot });
+
+const TestComponent = () => {
+  const [count, setCounter] = useState(0)
+
+  return (
+    <button onClick={() => setCounter(count => count + 1)}>
+      Click to increase: {count}
+    </button>
+  )
+}
+
+const {getByText, asFragment} = render(<TestComponent />)
+const firstRender = asFragment()
+
+fireEvent.click(getByText(/Click to increase/))
+
+// This will snapshot only the difference between the first render, and the
+// state of the DOM after the click event.
+expect(firstRender).toMatchDiffSnapshot(asFragment())
+```
+
+### cleanup
+
+render 메서드로 마운트된 리액트 트리를 언마운트 시킨다.

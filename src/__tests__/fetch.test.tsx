@@ -4,6 +4,9 @@ import { setupServer } from "msw/node";
 import { render, fireEvent, waitFor, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Fetch from "../components/Fetch";
+import { toMatchDiffSnapshot } from "snapshot-diff";
+
+expect.extend({ toMatchDiffSnapshot });
 
 const server = setupServer(
   rest.get("/greeting", (req, res, ctx) => {
@@ -16,12 +19,14 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 test("loads and displays greeting", async () => {
-  const { getByText } = render(<Fetch url="/greeting" />);
+  const { asFragment } = render(<Fetch url="/greeting" />);
+  const firstRender = asFragment();
 
-  fireEvent.click(getByText("Load Greeting"));
+  fireEvent.click(screen.getByText("Load Greeting"));
 
   await waitFor(() => screen.getByRole("heading"));
 
+  expect(firstRender).toMatchDiffSnapshot(asFragment());
   expect(screen.getByRole("heading")).toHaveTextContent("hello there");
   expect(screen.getByRole("button")).toBeDisabled();
 });
